@@ -152,7 +152,7 @@ typedef struct multiboot_memory_map {
 void kernel_main(multiboot_info_t* mbt, unsigned int magic) 
 {
 	terminal_initialize();
-	terminal_writestring("Hello, kernel World!\n");
+	terminal_writestring("Hello, World!\n");
 	multiboot_memory_map_tt* mmap = mbt->mmap_addr;
 	char * str = "";
 	itoa(mmap->base_addr_high, str);
