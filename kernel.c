@@ -149,7 +149,7 @@ typedef struct multiboot_memory_map {
 	unsigned int type;
 } multiboot_memory_map_tt;
 
-void kernel_main(multiboot_info_t* mbt, unsigned int magic) 
+void kernel_main(multiboot_info_t* mbt) 
 {
 	terminal_initialize();
 	terminal_writestring("Hello, World!\n");

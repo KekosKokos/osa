@@ -84,7 +84,6 @@ _start:
 	stack since (pushed 0 bytes so far) and the alignment is thus
 	preserved and the call is well defined.
 	*/
-	push %eax
     push %ebx
 	call kernel_main
  
