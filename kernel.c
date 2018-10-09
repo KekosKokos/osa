@@ -147,13 +147,13 @@ typedef struct multiboot_memory_map {
 	unsigned int length_low,length_high;
 // You can also use: unsigned long long int length; if supported.
 	unsigned int type;
-} multiboot_memory_map_t;
+} multiboot_memory_map_tt;
 
 void kernel_main(multiboot_info_t* mbt, unsigned int magic) 
 {
 	terminal_initialize();
 	terminal_writestring("Hello, kernel World!\n");
-	multiboot_memory_map_t* mmap = mbt->mmap_addr;
+	multiboot_memory_map_tt* mmap = mbt->mmap_addr;
 	char * str = "";
 	itoa(mmap->base_addr_high, str);
 	itoa(mmap->base_addr_low, str);
