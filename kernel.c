@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
- 
+#include "multiboot.h"
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -96,19 +96,73 @@ void terminal_putchar(char c)
 void terminal_write(const char* data, size_t size) 
 {
 	for (size_t i = 0; i < size; i++)
+	{
+		if(data[i] == '\n')
+		{
+			if (++terminal_row == VGA_HEIGHT)
+				terminal_row = 0;
+			continue;
+		}
 		terminal_putchar(data[i]);
+	}
 }
  
 void terminal_writestring(const char* data) 
 {
 	terminal_write(data, strlen(data));
 }
+
+ void reverse(char s[])
+ {
+     int i, j;
+     char c;
  
-void kernel_main(void) 
+     for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+         c = s[i];
+         s[i] = s[j];
+         s[j] = c;
+     }
+ }
+
+void itoa(int n, char s[])
 {
-	/* Initialize terminal interface */
-	terminal_initialize();
+	int i, sign;
+
+	if ((sign = n) < 0)  /* записываем знак */
+		n = -n;          /* делаем n положительным числом */
+	i = 0;
+	do {       /* генерируем цифры в обратном порядке */
+		s[i++] = n % 10 + '0';   /* берем следующую цифру */
+	} while ((n /= 10) > 0);     /* удаляем */
+	if (sign < 0)
+		s[i++] = '-';
+	s[i] = '\0';
+	reverse(s);
+}
  
-	/* Newline support is left as an exercise. */
+typedef struct multiboot_memory_map {
+	unsigned int size;
+	unsigned int base_addr_low,base_addr_high;
+// You can also use: unsigned long long int base_addr; if supported.
+	unsigned int length_low,length_high;
+// You can also use: unsigned long long int length; if supported.
+	unsigned int type;
+} multiboot_memory_map_t;
+
+void kernel_main(multiboot_info_t* mbt, unsigned int magic) 
+{
+	terminal_initialize();
 	terminal_writestring("Hello, kernel World!\n");
+	multiboot_memory_map_t* mmap = mbt->mmap_addr;
+	char * str = "";
+	itoa(mmap->base_addr_high, str);
+	itoa(mmap->base_addr_low, str);
+	terminal_writestring(str);
+	while(mmap < mbt->mmap_addr + mbt->mmap_length) {
+		mmap = (multiboot_memory_map_t*) ( (unsigned int)mmap + mmap->size + sizeof(mmap->size) );
+		char * stra = "";
+		itoa(mmap->base_addr_high, stra);
+		itoa(mmap->base_addr_low, stra);
+		terminal_writestring(stra);
+	}
 }
